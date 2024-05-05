@@ -27,25 +27,42 @@ function repeatString(str, n) {
   return new Array(n).fill(str).join(" ");
 }
 
-const player = {
+const cursor = {
   x: 1,
   y: 1,
 };
-
+document.addEventListener('keydown', (event) => {
+  switch(event.key) {
+  case 'ArrowUp':
+    cursor.y -= 1;
+    break;
+  case 'ArrowDown':
+    cursor.y += 1;
+    break;
+  case 'ArrowLeft':
+    cursor.x -= 1;
+    break;
+  case 'ArrowRight':
+    cursor.x += 1;
+    break;
+  }
+  console.log(cursor);
+  drawBoard();
+});
 const drawBoard = () => {
-  // Clear the existing grid items
+
   gameBoard.innerHTML = '';
 
-  const playerCurrentLetter = gameGrid[player.x][player.y];
+  const playerCurrentLetter = gameGrid[cursor.y][cursor.x];
 
   gameBoard.style.gridTemplateColumns = repeatString("1fr", gameGrid.length);
 
-  for(var x=0;x<gameGrid.length;x++) {
-    for(var y=0;y<gameGrid[x].length;y++) {
+  for(var y=0;y<height;y++) {
+    for(var x=0;x<width;x++) {
       const div = document.createElement("div");
       div.classList.add("item");
-      if(player.x == x && player.y == y) {
-        div.classList.add("currentItem");
+      if(cursor.x == x && cursor.y == y) {
+        div.classList.add("cursorItem");
       } else {
         if(findDictEntriesWithPrefix(playerCurrentLetter + gameGrid[x][y]).length > 0) {
           div.classList.add("validMove");
@@ -57,24 +74,7 @@ const drawBoard = () => {
     }
   }
 };
-};
 
 
 initializeGrid();
-document.addEventListener('keydown', function(event) {
-    switch(event.key) {
-        case 'ArrowUp':
-            player.y = Math.max(0, player.y - 1);
-            break;
-        case 'ArrowDown':
-            player.y = Math.min(height - 1, player.y + 1);
-            break;
-        case 'ArrowLeft':
-            player.x = Math.max(0, player.x - 1);
-            break;
-        case 'ArrowRight':
-            player.x = Math.min(width - 1, player.x + 1);
-            break;
-    }
-    drawBoard();
-});
+drawBoard();
