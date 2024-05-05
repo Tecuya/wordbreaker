@@ -35,7 +35,7 @@ const viewport = {
   y2: cursor.y+1,
 };
 
-let selectedLetters = ''; // Global string to store selected letters
+let selectedLetters = '';
 var madeWordsList = [];
 var currentWordCost = 0;
 var currentWordLogList = [];
@@ -107,6 +107,76 @@ function testAndAcceptNewLetter(newLetter) {
   }
 }
 
+const validMoveCache = {};
+
+const draw = () => {
+
+  gameBoard.innerHTML = '';
+  currentLetters.innerHTML = selectedLetters;
+
+  const cursorCurrentLetter = gameGrid[cursor.x][cursor.y].letter;
+
+  gameBoard.style.gridTemplateColumns = repeatString("1fr", viewport.x2 - viewport.x1 + 1);
+
+  for(var y=viewport.y1;y<=viewport.y2;y++) {
+    for(var x=viewport.x1;x<=viewport.x2;x++) {
+
+      if(
+        (x == cursor.x || x == cursor.x + 1 || x == cursor.x - 1) &&
+          (y == cursor.y || y == cursor.y + 1 || y == cursor.y - 1))
+      {
+        gameGrid[x][y].visible = true;
+      }
+
+      const div = document.createElement("div");
+      div.classList.add("item");
+
+      if(cursor.x == x && cursor.y == y) {
+        div.classList.add("cursorItem");
+      }
+
+      if(gameGrid[x][y].visible) {
+
+        const wordSoFar = selectedLetters + gameGrid[x][y].letter;
+        if(!validMoveCache.hasOwnProperty(wordSoFar)) {
+          const matchingEntries = findDictEntriesWithPrefix(wordSoFar);
+          validMoveCache[wordSoFar] = (matchingEntries.length > 0);
+        }
+        if(validMoveCache[wordSoFar]) {
+          div.classList.add("validMove");
+        }
+
+        div.innerHTML = gameGrid[x][y].letter;
+      } else {
+        div.innerHTML = "";
+      }
+
+      gameBoard.appendChild(div);
+    }
+  }
+
+  madeWords.innerHTML = "<h2>Word List</h2>";
+  madeWordsList.forEach((word) => {
+    if(word.reusable) {
+      madeWords.innerHTML += "<i>" + word.word + "</i>" + word.scoring + "<br />";
+    } else {
+      madeWords.innerHTML += word.word + " " + word.scoring + "<br />";
+    }
+  });
+
+  var cwl = "<h2>Current Word</h2><p>Total cost: <b>"+currentWordCost+"</b></p><div>";
+  currentWordLogList.forEach((log) => {
+    cwl += log + "<br />";
+  });
+  cwl += "</div>";
+
+  currentWordLog.innerHTML = cwl;
+
+  scoreDiv.innerHTML = "<h2>Score</h2>";
+  scoreDiv.innerHTML += "Score Total: <b>" + score.toFixed(2) + "</b><br>";
+  scoreDiv.innerHTML += "Word Count: <b>" + madeWordsList.length + "</b><br>";
+  scoreDiv.innerHTML += "Average: <b>" + (score/madeWordsList.length).toFixed(2) + "</b><br>";
+};
 
 document.addEventListener('keydown', (event) => {
   switch(event.key) {
@@ -204,79 +274,6 @@ document.addEventListener('keydown', (event) => {
   }
   draw();
 });
-
-const validMoveCache = {};
-
-const draw = () => {
-
-  gameBoard.innerHTML = '';
-  currentLetters.innerHTML = selectedLetters;
-
-  const cursorCurrentLetter = gameGrid[cursor.x][cursor.y].letter;
-
-  gameBoard.style.gridTemplateColumns = repeatString("1fr", viewport.x2 - viewport.x1 + 1);
-
-  for(var y=viewport.y1;y<=viewport.y2;y++) {
-    for(var x=viewport.x1;x<=viewport.x2;x++) {
-
-
-      if(
-        (x == cursor.x || x == cursor.x + 1 || x == cursor.x - 1) &&
-          (y == cursor.y || y == cursor.y + 1 || y == cursor.y - 1))
-      {
-        gameGrid[x][y].visible = true;
-      }
-
-      const div = document.createElement("div");
-      div.classList.add("item");
-
-      if(cursor.x == x && cursor.y == y) {
-        div.classList.add("cursorItem");
-      }
-
-      if(gameGrid[x][y].visible) {
-
-        const wordSoFar = selectedLetters + gameGrid[x][y].letter;
-        if(!validMoveCache.hasOwnProperty(wordSoFar)) {
-          const matchingEntries = findDictEntriesWithPrefix(wordSoFar);
-          validMoveCache[wordSoFar] = (matchingEntries.length > 0);
-        }
-        if(validMoveCache[wordSoFar]) {
-          div.classList.add("validMove");
-        }
-
-        div.innerHTML = gameGrid[x][y].letter;
-      } else {
-        div.innerHTML = "";
-      }
-
-      gameBoard.appendChild(div);
-    }
-  }
-
-  madeWords.innerHTML = "<h2>Word List</h2>";
-  madeWordsList.forEach((word) => {
-    if(word.reusable) {
-      madeWords.innerHTML += "<i>" + word.word + "</i>" + word.scoring + "<br />";
-    } else {
-      madeWords.innerHTML += word.word + " " + word.scoring + "<br />";
-    }
-  });
-
-  var cwl = "<h2>Current Word</h2><p>Total cost: <b>"+currentWordCost+"</b></p><div>";
-  currentWordLogList.forEach((log) => {
-    cwl += log + "<br />";
-  });
-  cwl += "</div>";
-
-  currentWordLog.innerHTML = cwl;
-
-  scoreDiv.innerHTML = "<h2>Score</h2>";
-  scoreDiv.innerHTML += "Score Total: <b>" + score.toFixed(2) + "</b><br>";
-  scoreDiv.innerHTML += "Word Count: <b>" + madeWordsList.length + "</b><br>";
-  scoreDiv.innerHTML += "Average: <b>" + (score/madeWordsList.length).toFixed(2) + "</b><br>";
-};
-
 
 initializeGrid();
 draw();
