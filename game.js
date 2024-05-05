@@ -18,10 +18,10 @@ const startPosition = {x: 5, y: 5};
 const cursorCost = 1;
 const resetCost = 5;
 const notWordCost = 3;
-const typingCost = 7;
-
+const typingCost = 10;
 const minWordLength = 2;
-const scoreGoal = 40;
+const scoreGoal = 100;
+const wordLengthBonus = 20;
 
 var score = 0;
 
@@ -210,6 +210,29 @@ function fullReset() {
     dictionaryMatches.innerHTML = "";
 }
 
+function findNearestVisibleLetterPosition(letter) {
+    let nearestPosition = null;
+    let shortestDistance = Number.MAX_VALUE;
+    for (let y = 0; y < gridSize.y; y++) {
+        for (let x = 0; x < gridSize.x; x++) {
+            if (gameGrid[x][y].visible && gameGrid[x][y].letter === letter) {
+                const distance = Math.abs(x - cursor.x) + Math.abs(y - cursor.y);
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    nearestPosition = { x: x, y: y, distance: distance };
+                }
+            }
+        }
+    }
+    return nearestPosition;
+}
+
+function moveCursorToNearestLetter(position) {
+    // Update the cursor position to the nearest letter's coordinates
+    cursor.x = position.x;
+    cursor.y = position.y;
+}
+
 gameOverModalClose.onclick = function() {
   fullReset();
   draw();
@@ -263,10 +286,10 @@ document.addEventListener('keydown', (event) => {
       dictionaryMatches.innerHTML = formatDictEntries(matchingEntries2);
       madeWordsList.unshift({
         word: selectedLetters,
-        scoring: "("+selectedLetters.length*10+"/"+currentWordCost+" = "+(selectedLetters.length*10/currentWordCost).toFixed(2)+")",
+        scoring: "("+selectedLetters.length*wordLengthBonus+"/"+currentWordCost+" = "+(selectedLetters.length*wordLengthBonus/currentWordCost).toFixed(2)+")",
         reusable: false,
       });
-      score += selectedLetters.length*10/currentWordCost;
+      score += selectedLetters.length*wordLengthBonus/currentWordCost;
       selectedLetters = "";
       currentWordCost = 0;
       currentWordLogList = [];
@@ -282,17 +305,26 @@ document.addEventListener('keydown', (event) => {
     break;
   }
 
-        // Check if the typed letter is visible on the screen and move the cursor if it is
-        const typedLetter = event.key.toUpperCase();
-        const nearestVisibleLetterPosition = findNearestVisibleLetterPosition(typedLetter);
-        if (nearestVisibleLetterPosition) {
-            moveCursorToNearestLetter(nearestVisibleLetterPosition);
-            incrementWordCost(cursorCost * nearestVisibleLetterPosition.distance, "moved cursor to " + typedLetter);
-        } else {
-            testAndAcceptNewLetter(typedLetter);
-            incrementWordCost(typingCost, "typed " + typedLetter);
-        }
-
+  if(/^[a-zA-Z]$/.test(event.key)) {
+    // Check if the typed letter is visible on the screen and move the cursor if it is
+    const typedLetter = event.key.toUpperCase();
+    const nearestVisibleLetterPosition = findNearestVisibleLetterPosition(typedLetter);
+    if (nearestVisibleLetterPosition) {
+      const moveCost = nearestVisibleLetterPosition.distance*cursorCost;
+      if(moveCost < typingCost) {
+        moveCursorToNearestLetter(nearestVisibleLetterPosition);
+        testAndAcceptNewLetter(gameGrid[nearestVisibleLetterPosition.x][nearestVisibleLetterPosition.y].letter);
+        incrementWordCost(moveCost, "typed cursor to " + typedLetter);
+      } else {
+        testAndAcceptNewLetter(typedLetter);
+        incrementWordCost(typingCost, "typed " + typedLetter);
+      }
+    } else {
+      testAndAcceptNewLetter(typedLetter);
+      incrementWordCost(typingCost, "typed " + typedLetter);
+    }
+  }
+  
   if(cursor.x <= viewport.x1 && viewport.x1 > 0) {
     viewport.x1 -= 1;
   }
@@ -306,31 +338,6 @@ document.addEventListener('keydown', (event) => {
     viewport.y2 += 1;
   }
   draw();
-function findNearestVisibleLetterPosition(letter) {
-    let nearestPosition = null;
-    let shortestDistance = Number.MAX_VALUE;
-    for (let y = 0; y < gridSize.y; y++) {
-        for (let x = 0; x < gridSize.x; x++) {
-            if (gameGrid[x][y].visible && gameGrid[x][y].letter === letter) {
-                const distance = Math.abs(x - cursor.x) + Math.abs(y - cursor.y);
-                if (distance < shortestDistance) {
-                    shortestDistance = distance;
-                    nearestPosition = { x: x, y: y, distance: distance };
-                }
-            }
-        }
-    }
-    return nearestPosition;
-}
-
+});
 initializeGrid();
-function moveCursorToNearestLetter(position) {
-    // Update the cursor position to the nearest letter's coordinates
-    cursor.x = position.x;
-    cursor.y = position.y;
-    // Adjust the viewport if necessary
-    if(cursor.x < viewport.x1) viewport.x1 = cursor.x;
-    if(cursor.x > viewport.x2) viewport.x2 = cursor.x;
-    if(cursor.y < viewport.y1) viewport.y1 = cursor.y;
-    if(cursor.y > viewport.y2) viewport.y2 = cursor.y;
-}
+draw();
