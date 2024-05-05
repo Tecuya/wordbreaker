@@ -6,8 +6,9 @@ const dictionaryMatches = document.getElementById("dictionaryMatches");
 
 let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-const width = 3;
-const height = 3;
+const gridSize = {x: 30, y: 30};
+const startPosition = {x: 15, y: 15};
+
 var gameGrid = [];
 
 function findDictEntriesWithPrefix(prefix) {
@@ -16,9 +17,9 @@ function findDictEntriesWithPrefix(prefix) {
 
 function initializeGrid() {
   gameGrid = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < gridSize.y; i++) {
     let row = [];
-    for (let j = 0; j < 3; j++) {
+    for (let j = 0; j < gridSize.x; j++) {
         let randomIndex = Math.floor(Math.random() * letters.length);
         row.push(letters[randomIndex]);
     }
@@ -31,8 +32,8 @@ function repeatString(str, n) {
 }
 
 const cursor = {
-  x: 1,
-  y: 1,
+  x: startPosition.x,
+  y: startPosition.y,
 };
 let selectedLetters = ''; // Global string to store selected letters
 
@@ -45,18 +46,18 @@ document.addEventListener('keydown', (event) => {
       cursor.y = Math.max(0, cursor.y - 1);
       break;
     case 'ArrowDown':
-      cursor.y = Math.min(height - 1, cursor.y + 1);
+    cursor.y = Math.min(gridSize.y - 1, cursor.y + 1);
       break;
     case 'ArrowLeft':
       cursor.x = Math.max(0, cursor.x - 1);
       break;
     case 'ArrowRight':
-      cursor.x = Math.min(width - 1, cursor.x + 1);
+    cursor.x = Math.min(gridSize.x - 1, cursor.x + 1);
       break;
     case 'Enter':
       selectedLetters += gameGrid[cursor.x][cursor.y];
       const matchingEntries = findDictEntriesWithPrefix(selectedLetters);
-      dictionaryMatches.innerHTML = JSON.stringify(matchingEntries);
+      dictionaryMatches.innerHTML = JSON.stringify(matchingEntries[0]);
       break;
   }
   draw();
@@ -69,10 +70,10 @@ const draw = () => {
 
   const cursorCurrentLetter = gameGrid[cursor.x][cursor.y];
 
-  gameBoard.style.gridTemplateColumns = repeatString("1fr", gameGrid.length);
+  gameBoard.style.gridTemplateColumns = repeatString("1fr", 3);
 
-  for(var y=0;y<height;y++) {
-    for(var x=0;x<width;x++) {
+  for(var y=cursor.y-1;y<cursor.y+2;y++) {
+    for(var x=cursor.x-1;x<cursor.x+2;x++) {
       const div = document.createElement("div");
       div.classList.add("item");
 
