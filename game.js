@@ -9,6 +9,10 @@ const scoreDiv = document.getElementById('score');
 const gameOverModal = document.getElementById("gameOverModal");
 const gameOverModalClose = document.getElementById("gameOverModalClose");
 const gameOverModalStats = document.getElementById("gameOverModalStats");
+const rulesLink = document.getElementById('rulesLink');
+const rulesModal = document.getElementById("rulesModal");
+const rulesModalClose = document.getElementById("rulesModalClose");
+const rulesModalVars = document.getElementById("rulesModalVars");
 
 let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
@@ -17,11 +21,11 @@ const startPosition = {x: 5, y: 5};
 
 const cursorCost = 0.5;
 const resetCost = 5;
-const notWordCost = 3;
-const typingCost = 5;
+const notWordCost = 0;
+const arbitraryLetterCost = 5;
 const minWordLength = 2;
 const scoreGoal = 100;
-const lengthScale = 2;
+const lengthScale = 2; // note theres a hard-coded 2 unicode superscript
 
 var score = 0;
 
@@ -115,9 +119,29 @@ function testAndAcceptNewLetter(newLetter) {
 
 const validMoveCache = {};
 
-function openModal() {
+function openGameOverModal() {
   gameOverModal.style.display = "block";
 }
+
+function openRulesModal() {
+  rulesModal.style.display = "block";
+}
+
+const drawRules = () => {
+  var rules = "";
+  rules += "<table>";
+  rules += "<b>Grid Size:</b> "+gridSize.x+" x "+gridSize.y+"<br />";
+  rules += "<b>Start Position:</b> "+startPosition.x+" x "+startPosition.y+"<br />";
+  rules += "<b>Arbitrary Letter Cost:</b> "+arbitraryLetterCost+"<br />";
+  rules += "<b>Reset Board Cost:</b> "+resetCost+"<br />";
+  rules += "<b>Cursor Movement Cost:</b> "+cursorCost+"<br />";
+  rules += "<b>Min Word Length:</b>"+minWordLength+"<br />";
+  rules += "<b>Game Over Points:</b>"+scoreGoal+"<br />";
+  rules += "<b>Word Length Exponent:</b>"+lengthScale+"<br />";
+  
+  
+  rulesModalVars.innerHTML = rules;
+};
 
 const draw = () => {
 
@@ -190,7 +214,7 @@ const draw = () => {
 
   if(score > scoreGoal) {
     gameOverModalStats.innerHTML = "Final Score: <b>" + (score/madeWordsList.length).toFixed(2) + "</b>";
-    openModal();
+    openGameOverModal();
   }
 };
 
@@ -232,11 +256,19 @@ function moveCursorToNearestLetter(position) {
     cursor.x = position.x;
     cursor.y = position.y;
 }
+rulesLink.onclick = function() {
+  openRulesModal();
+}
 
 gameOverModalClose.onclick = function() {
   fullReset();
   draw();
   gameOverModal.style.display = "none";
+}
+
+rulesModalClose.onclick = function() {
+  draw();
+  rulesModal.style.display = "none";
 }
 
 document.addEventListener('keydown', (event) => {
@@ -286,7 +318,7 @@ document.addEventListener('keydown', (event) => {
       dictionaryMatches.innerHTML = formatDictEntries(matchingEntries2);
       madeWordsList.unshift({
         word: selectedLetters,
-        scoring: "("+selectedLetters.length+"^"+lengthScale+"/"+currentWordCost+" = "+(selectedLetters.length**2/currentWordCost).toFixed(2)+")",
+        scoring: "("+selectedLetters.length+"²/"+currentWordCost+" = "+(selectedLetters.length**2/currentWordCost).toFixed(2)+")",
         reusable: false,
       });
       score += selectedLetters.length**lengthScale/currentWordCost;
@@ -311,17 +343,17 @@ document.addEventListener('keydown', (event) => {
     const nearestVisibleLetterPosition = findNearestVisibleLetterPosition(typedLetter);
     if (nearestVisibleLetterPosition) {
       const moveCost = nearestVisibleLetterPosition.distance*cursorCost;
-      if(moveCost < typingCost) {
+      if(moveCost < arbitraryLetterCost) {
         moveCursorToNearestLetter(nearestVisibleLetterPosition);
         testAndAcceptNewLetter(gameGrid[nearestVisibleLetterPosition.x][nearestVisibleLetterPosition.y].letter);
         incrementWordCost(moveCost, "typed cursor to " + typedLetter);
       } else {
         testAndAcceptNewLetter(typedLetter);
-        incrementWordCost(typingCost, "typed " + typedLetter);
+        incrementWordCost(arbitraryLetterCost, "arbitrary letter " + typedLetter);
       }
     } else {
       testAndAcceptNewLetter(typedLetter);
-      incrementWordCost(typingCost, "typed " + typedLetter);
+      incrementWordCost(arbitraryLetterCost, "arbitrary letter " + typedLetter);
     }
   }
   
@@ -340,4 +372,6 @@ document.addEventListener('keydown', (event) => {
   draw();
 });
 initializeGrid();
+drawRules();
 draw();
+

@@ -67,6 +67,10 @@
       display: block;
       width: 800px;
     }
+    #rulesLink {
+      color: blue;
+      cursor: pointer;
+    }
     .item {
       font-size: 20px;
       border: 2px solid #aaa;
@@ -103,19 +107,18 @@
     /* Modal Content/Box */
     .modal-content {
       background-color: #fefefe;
-      margin: 15% auto; /* 15% from the top and centered */
-      padding: 20px;
+      margin: 100px auto; /* 15% from the top and centered */
+      padding: 10px;
       border: 3px solid #888;
       width: 800px; /* Could be more or less, depending on screen size */
-      height: 200px;
     }
 
     /* The Close Button */
     .close {
       color: #aaa;
-      float: right;
       font-size: 28px;
-      font-weight: bold;
+    font-weight: bold;
+    padding-left: 660px;
     }
 
     .close:hover,
@@ -127,7 +130,11 @@
 
     .helpbox {
       float: left;
-      width: 400px;
+      width: 230px;
+    }
+
+    #rulesModal {
+      font-size: 10pt;
     }
   </style>
 </head>
@@ -158,6 +165,9 @@
       Space - add letter under cursor<br />
       0 key - reset the game<br />
     </div>
+    <div class="helpbox" id="rulesLink">
+      Explanation
+    </div>
   </div>
   <div id="gameOverModal" class="modal">
     <div class="modal-content">
@@ -167,7 +177,48 @@
       <div id="gameOverModalClose" class="close">Close</div>
     </div>
   </div>
-  <script type="module" src="game.js"></script>
+  <div id="rulesModal" class="modal">
+    <div class="modal-content">
+      <h3>Explanation</h3>
+      <p>
+        You can form words by moving the cursor to letters with the
+        arrow keys and selecting them with the space bar, or by simply
+        typing letters you see.  The goal is to form long words at the
+        lowest cost.  You may only select letters which lead to
+        completing a word.
+      </p>
 
+      <p>
+        If you type a letter that is not visible, the game will give you
+        that letter, but it will charge the "arbitrary letter cost".
+      </p>
+
+      <p>
+        If you type a letter that is visible, the game will calculate
+        the cost of the cursor movements to select it, and if its cheaper
+        than the "arbitrary letter cost", it will jump to that position
+        and apply the appropriate cursor movement cost.
+      </p>
+
+      <p>
+        When you complete a word, its length is squared.  This is the
+        gain.  This gain is divided by the total cost to produce the
+        score for the word.
+      </p>
+
+      <p>At any time you may press `1` to get a fresh game board.</p>
+
+      <p>
+        The game will finish once you reach a set score limit.  Your
+        final score is your average word score.
+      </p>
+
+      <h3>Game Variables:</h3>
+      <div id="rulesModalVars">
+      </div>
+      <div id="rulesModalClose" class="close">Close</div>
+    </div>
+    <script type="module" src="game.js"></script>
+  </div>
 </body>
 </html>
