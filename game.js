@@ -18,7 +18,7 @@ const startPosition = {x: 5, y: 5};
 const cursorCost = 0.5;
 const resetCost = 5;
 const notWordCost = 3;
-const typingCost = 10;
+const typingCost = 5;
 const minWordLength = 2;
 const scoreGoal = 100;
 const lengthScale = 2;
@@ -174,7 +174,7 @@ const draw = () => {
     }
   });
 
-  var cwl = "<h2>Current Word</h2><p>Total cost: <b>"+currentWordCost+"</b></p><div>";
+  var cwl = "<h2>Word Cost</h2><p>Total cost: <b>"+currentWordCost+"</b></p><div>";
   currentWordLogList.forEach((log) => {
     cwl += log + "<br />";
   });

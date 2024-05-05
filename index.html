@@ -16,15 +16,15 @@
     #help {
       margin-left: auto;
       margin-right: auto;
-    width: 800px;
-    font-size: 10px;
+      width: 800px;
+      font-size: 10px;
     }
     #dictionaryMatches {
       margin-left: auto;
       margin-right: auto;
       margin-top: 10px;
       width: 800px;
-      height: 200px;
+      height: 150px;
       overflow: auto;
     }
     #currentLetters {
@@ -34,9 +34,10 @@
       width: 800px;
       margin-left: auto;
       margin-right: auto;
+      height: 1em;
     }
     #currentWordLog {
-      height: 200px;
+      height: 180px;
       width: 200px;
       overflow: auto;
       float: left;
@@ -49,14 +50,14 @@
       font-weight: bold;
       text-align: center;
       width: 400px;
-      height: 200px;
+      height: 180px;
       overflow: auto;
       float: left;
     }
     #score {
       padding: 3px;
       width: 180px;
-      height: 200px;
+      height: 180px;
       overflow: auto;
       float: left;
      }
@@ -146,15 +147,15 @@
   <div id="dictionaryMatches">
   </div>
   <div id="help">
-    <h3>Help</h3>
+  <h3>Help: Type words that you see.  Get a new board when you are stuck. Longer words are worth more.</h3>
     <div class="helpbox">
-      Cursor keys - move selection<br />
-      Space - make selection<br />
-      Enter - score current word<br />
-    </div>
-    <div>
       A-Z keys - add letters to current word<br />
+      Enter - score current word<br />
       1 key - get a new board<br />
+    </div>
+    <div class="helpbox">
+      Cursor keys - move cursor<br />
+      Space - add letter under cursor<br />
       0 key - reset the game<br />
     </div>
   </div>
