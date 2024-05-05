@@ -1,6 +1,7 @@
 import { dictionary } from './dictionary.js';
 
 const gameBoard = document.getElementById("gameBoard");
+const currentLetters = document.getElementById("currentLetters");
 
 let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
@@ -49,6 +50,7 @@ document.addEventListener('keydown', (event) => {
   console.log(cursor);
   drawBoard();
 });
+
 const drawBoard = () => {
 
   gameBoard.innerHTML = '';
@@ -65,8 +67,9 @@ const drawBoard = () => {
         div.classList.add("cursorItem");
       } else {
         const wordSoFar = playerCurrentLetter + gameGrid[x][y];
-        if(findDictEntriesWithPrefix(wordSoFar).length > 0) {
-          console.log("wordsofar",wordSoFar);
+        const matchingEntries = findDictEntriesWithPrefix(wordSoFar);
+        if(matchingEntries.length > 0) {
+          console.log("wordsofar",wordSoFar,matchingEntries[0]);
           div.classList.add("validMove");
         }
       }
