@@ -282,10 +282,16 @@ document.addEventListener('keydown', (event) => {
     break;
   }
 
-  if(/^[a-zA-Z]$/.test(event.key)) {
-    testAndAcceptNewLetter(event.key.toUpperCase());
-    incrementWordCost(typingCost, "typed "+event.key);
-  }
+        // Check if the typed letter is visible on the screen and move the cursor if it is
+        const typedLetter = event.key.toUpperCase();
+        const nearestVisibleLetterPosition = findNearestVisibleLetterPosition(typedLetter);
+        if (nearestVisibleLetterPosition) {
+            moveCursorToNearestLetter(nearestVisibleLetterPosition);
+            incrementWordCost(cursorCost * nearestVisibleLetterPosition.distance, "moved cursor to " + typedLetter);
+        } else {
+            testAndAcceptNewLetter(typedLetter);
+            incrementWordCost(typingCost, "typed " + typedLetter);
+        }
 
   if(cursor.x <= viewport.x1 && viewport.x1 > 0) {
     viewport.x1 -= 1;
@@ -300,7 +306,31 @@ document.addEventListener('keydown', (event) => {
     viewport.y2 += 1;
   }
   draw();
-});
+function findNearestVisibleLetterPosition(letter) {
+    let nearestPosition = null;
+    let shortestDistance = Number.MAX_VALUE;
+    for (let y = 0; y < gridSize.y; y++) {
+        for (let x = 0; x < gridSize.x; x++) {
+            if (gameGrid[x][y].visible && gameGrid[x][y].letter === letter) {
+                const distance = Math.abs(x - cursor.x) + Math.abs(y - cursor.y);
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    nearestPosition = { x: x, y: y, distance: distance };
+                }
+            }
+        }
+    }
+    return nearestPosition;
+}
 
 initializeGrid();
-draw();
+function moveCursorToNearestLetter(position) {
+    // Update the cursor position to the nearest letter's coordinates
+    cursor.x = position.x;
+    cursor.y = position.y;
+    // Adjust the viewport if necessary
+    if(cursor.x < viewport.x1) viewport.x1 = cursor.x;
+    if(cursor.x > viewport.x2) viewport.x2 = cursor.x;
+    if(cursor.y < viewport.y1) viewport.y1 = cursor.y;
+    if(cursor.y > viewport.y2) viewport.y2 = cursor.y;
+}
