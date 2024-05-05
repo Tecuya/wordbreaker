@@ -32,20 +32,26 @@ const cursor = {
   x: 1,
   y: 1,
 };
+let selectedLetters = ''; // Global string to store selected letters
+
 document.addEventListener('keydown', (event) => {
   switch(event.key) {
-  case 'ArrowUp':
-    cursor.y -= 1;
-    break;
-  case 'ArrowDown':
-    cursor.y += 1;
-    break;
-  case 'ArrowLeft':
-    cursor.x -= 1;
-    break;
-  case 'ArrowRight':
-    cursor.x += 1;
-    break;
+    case 'ArrowUp':
+      cursor.y = Math.max(0, cursor.y - 1);
+      break;
+    case 'ArrowDown':
+      cursor.y = Math.min(height - 1, cursor.y + 1);
+      break;
+    case 'ArrowLeft':
+      cursor.x = Math.max(0, cursor.x - 1);
+      break;
+    case 'ArrowRight':
+      cursor.x = Math.min(width - 1, cursor.x + 1);
+      break;
+    case 'Enter':
+      selectedLetters += gameGrid[cursor.x][cursor.y];
+      drawBoard();
+      break;
   }
   console.log(cursor);
   drawBoard();
@@ -54,6 +60,7 @@ document.addEventListener('keydown', (event) => {
 const drawBoard = () => {
 
   gameBoard.innerHTML = '';
+  currentLetters.innerHTML = selectedLetters; // Render the selected letters into the "currentLetters" div
 
   const playerCurrentLetter = gameGrid[cursor.x][cursor.y];
 
