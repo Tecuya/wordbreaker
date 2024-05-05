@@ -2,32 +2,74 @@
 <html>
 <head>
   <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+
     #gameBoard {
       margin-left: auto;
       margin-right: auto;
       display: grid;
-      gap: 10px;
-      width: 500px;
+      width: 800px;
+    }
+    #dictionaryMatches {
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 10px;
+      font-weight: bold;
+      width: 800px;
     }
     #currentLetters {
       font-size: 24px;
       font-weight: bold;
       text-align: center;
-      margin: 20px;
+      margin: 10px;
+    }
+    #currentWordLog {
+      height: 200px;
+      width: 200px;
+      overflow: auto;
+      float: left;
+    }
+    #madeWords {
+      font-size: 15px;
+      font-weight: bold;
+      text-align: center;
+      width: 400px;
+      height: 200px;
+      overflow: auto;
+      float: left;
+    }
+    #score {
+      width: 200px;
+      height: 200px;
+      overflow: auto;
+      float: left;
+     }
+    #statusLine {
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      width: 800px;
     }
     .item {
-      background: #eee;
       padding: 10px;
-      border: 1px solid #ddd;
+      font-size: 20px;
+      border: 2px solid #aaa;
       text-align: center;
     }
     .cursorItem {
-      background: #FF8;
+      background: #FF8 !important;
       padding: 10px;
       text-align: center;
     }
     .validMove {
-      border: 3px solid #99F;
+      border: 2px solid #383;
+      background: #EFE;
+    }
+    #dictionaryMatches {
+      clear: both;
+      padding-top: 15px;
     }
   </style>
 </head>
@@ -36,7 +78,15 @@
   </div>
   <div id="currentLetters">
   </div>
-  <dixv id="dictionaryMatches">
+  <div id="statusLine">
+    <div id="currentWordLog">
+    </div>
+    <div id="madeWords">
+    </div>
+    <div id="score">
+    </div>
+  </div>
+  <div id="dictionaryMatches">
   </div>
   <script type="module" src="game.js"></script>
 </body>
