@@ -6,6 +6,9 @@ const dictionaryMatches = document.getElementById("dictionaryMatches");
 const madeWords = document.getElementById('madeWords');
 const currentWordLog = document.getElementById('currentWordLog');
 const scoreDiv = document.getElementById('score');
+const gameOverModal = document.getElementById("gameOverModal");
+const gameOverModalClose = document.getElementById("gameOverModalClose");
+const gameOverModalStats = document.getElementById("gameOverModalStats");
 
 let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
@@ -14,10 +17,11 @@ const startPosition = {x: 5, y: 5};
 
 const cursorCost = 1;
 const resetCost = 5;
-const notWordCost = 10;
-const typingCost = 10;
+const notWordCost = 3;
+const typingCost = 7;
 
 const minWordLength = 2;
+const scoreGoal = 40;
 
 var score = 0;
 
@@ -109,6 +113,10 @@ function testAndAcceptNewLetter(newLetter) {
 
 const validMoveCache = {};
 
+function openModal() {
+  gameOverModal.style.display = "block";
+}
+
 const draw = () => {
 
   gameBoard.innerHTML = '';
@@ -173,14 +181,18 @@ const draw = () => {
   currentWordLog.innerHTML = cwl;
 
   scoreDiv.innerHTML = "<h2>Score</h2>";
-  scoreDiv.innerHTML += "Score Total: <b>" + score.toFixed(2) + "</b><br>";
+  scoreDiv.innerHTML += "Points: <b>" + (score).toFixed(2) + "</b><br>";
+  scoreDiv.innerHTML += "Remaining: <b>" + (scoreGoal - score).toFixed(2) + "</b><br>";
   scoreDiv.innerHTML += "Word Count: <b>" + madeWordsList.length + "</b><br>";
-  scoreDiv.innerHTML += "Average: <b>" + (score/madeWordsList.length).toFixed(2) + "</b><br>";
+  scoreDiv.innerHTML += "Score: <b>" + (score/madeWordsList.length).toFixed(2) + "</b><br>";
+
+  if(score > scoreGoal) {
+    gameOverModalStats.innerHTML = "Final Score: <b>" + (score/madeWordsList.length).toFixed(2) + "</b>";
+    openModal();
+  }
 };
 
-document.addEventListener('keydown', (event) => {
-  switch(event.key) {
-  case '0':
+function fullReset() {
     selectedLetters = "";
     initializeGrid();
     cursor.x = startPosition.x;
@@ -194,6 +206,18 @@ document.addEventListener('keydown', (event) => {
     currentWordCost = 0;
     currentWordLogList = [];
     dictionaryMatches.innerHTML = "";
+}
+
+gameOverModalClose.onclick = function() {
+  fullReset();
+  draw();
+  gameOverModal.style.display = "none";
+}
+
+document.addEventListener('keydown', (event) => {
+  switch(event.key) {
+  case '0':
+    fullReset();
     break;
   case '1':
     incrementWordCost(resetCost, "reset");
