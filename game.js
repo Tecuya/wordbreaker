@@ -13,7 +13,7 @@ const gridSize = {x: 10, y: 10};
 const startPosition = {x: 5, y: 5};
 
 const cursorCost = 1;
-const resetCost = 10;
+const resetCost = 5;
 const notWordCost = 10;
 const typingCost = 10;
 
