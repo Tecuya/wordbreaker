@@ -53,7 +53,7 @@ const drawBoard = () => {
 
   gameBoard.innerHTML = '';
 
-  const playerCurrentLetter = gameGrid[cursor.y][cursor.x];
+  const playerCurrentLetter = gameGrid[cursor.x][cursor.y];
 
   gameBoard.style.gridTemplateColumns = repeatString("1fr", gameGrid.length);
 
@@ -64,7 +64,9 @@ const drawBoard = () => {
       if(cursor.x == x && cursor.y == y) {
         div.classList.add("cursorItem");
       } else {
-        if(findDictEntriesWithPrefix(playerCurrentLetter + gameGrid[x][y]).length > 0) {
+        const wordSoFar = playerCurrentLetter + gameGrid[x][y];
+        if(findDictEntriesWithPrefix(wordSoFar).length > 0) {
+          console.log("wordsofar",wordSoFar);
           div.classList.add("validMove");
         }
       }
