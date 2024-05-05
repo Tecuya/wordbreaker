@@ -33,6 +33,8 @@ const player = {
 };
 
 const drawBoard = () => {
+  // Clear the existing grid items
+  gameBoard.innerHTML = '';
 
   const playerCurrentLetter = gameGrid[player.x][player.y];
 
@@ -55,7 +57,24 @@ const drawBoard = () => {
     }
   }
 };
+};
 
 
 initializeGrid();
-drawBoard();
+document.addEventListener('keydown', function(event) {
+    switch(event.key) {
+        case 'ArrowUp':
+            player.y = Math.max(0, player.y - 1);
+            break;
+        case 'ArrowDown':
+            player.y = Math.min(height - 1, player.y + 1);
+            break;
+        case 'ArrowLeft':
+            player.x = Math.max(0, player.x - 1);
+            break;
+        case 'ArrowRight':
+            player.x = Math.min(width - 1, player.x + 1);
+            break;
+    }
+    drawBoard();
+});
