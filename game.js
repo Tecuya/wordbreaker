@@ -13,12 +13,10 @@ const gridSize = {x: 10, y: 10};
 const startPosition = {x: 5, y: 5};
 
 const cursorCost = 1;
-const viewportCost = 2;
 const resetCost = 10;
 const notWordCost = 10;
 
 var score = 0;
-var keypresses = 0;
 
 var gameGrid = [];
 
@@ -30,13 +28,26 @@ function findDictEntriesWithExactMatch(word) {
   return dictionary.filter(dictEntry => dictEntry[0].toLowerCase() == word.toLowerCase());
 }
 
+function formatDictEntries(entries) {
+  var response = "";
+  var lastEntry = "";
+  entries.forEach((entry) => {
+    if(lastEntry != entry[0]) {
+      response += "<b>"+entry[0]+"</b><br>";
+      lastEntry = entry[0];
+    }
+    response += entry[1] + " - " + entry[2].replace("\n","") + "<br />";
+  });
+  return response;
+}
+
 function initializeGrid() {
   gameGrid = [];
   for (let i = 0; i < gridSize.y; i++) {
     let row = [];
     for (let j = 0; j < gridSize.x; j++) {
-        let randomIndex = Math.floor(Math.random() * letters.length);
-        row.push(letters[randomIndex]);
+      let randomIndex = Math.floor(Math.random() * letters.length);
+      row.push({letter: letters[randomIndex], visible: false});
     }
     gameGrid.push(row);
   }
@@ -71,7 +82,6 @@ function incrementWordCost(amount, action) {
 document.addEventListener('keydown', (event) => {
   switch(event.key) {
   case 'r':
-    keypresses += 1;
     incrementWordCost(resetCost, "reset");
     cursor.x = startPosition.x;
     cursor.y = startPosition.y;
@@ -82,45 +92,39 @@ document.addEventListener('keydown', (event) => {
     initializeGrid();
     break;
   case 'ArrowUp':
-    keypresses += 1;
     incrementWordCost(cursorCost, "cursor up");
     cursor.y = Math.max(0, cursor.y - 1);
     break;
   case 'ArrowDown':
-    keypresses += 1;
     incrementWordCost(cursorCost, "cursor down");
     cursor.y = Math.min(gridSize.y - 1, cursor.y + 1);
     break;
   case 'ArrowLeft':
-    keypresses += 1;
     incrementWordCost(cursorCost, "cursor left");
     cursor.x = Math.max(0, cursor.x - 1);
     break;
   case 'ArrowRight':
-    keypresses += 1;
     incrementWordCost(cursorCost, "cursor right");
     cursor.x = Math.min(gridSize.x - 1, cursor.x + 1);
     break;
   case ' ':
-    keypresses += 1;
-    const prospectiveLetters = selectedLetters + gameGrid[cursor.x][cursor.y];
+    const prospectiveLetters = selectedLetters + gameGrid[cursor.x][cursor.y].letter;
     const matchingEntries3 = findDictEntriesWithExactMatch(prospectiveLetters);
-    if(matchingEntries3.length > 0) { 
-      dictionaryMatches.innerHTML = JSON.stringify(matchingEntries3[0]);
+    if(matchingEntries3.length > 0) {
+      dictionaryMatches.innerHTML = formatDictEntries(matchingEntries3);
       selectedLetters = prospectiveLetters;
-    } else { 
+    } else {
       const matchingEntries = findDictEntriesWithPrefix(prospectiveLetters);
-      if(matchingEntries.length > 0) { 
-        dictionaryMatches.innerHTML = JSON.stringify(matchingEntries[0]);
+      if(matchingEntries.length > 0) {
+        dictionaryMatches.innerHTML = formatDictEntries(matchingEntries);
         selectedLetters = prospectiveLetters;
       }
     }
     break;
   case 'Enter':
-    keypresses += 1;
     const matchingEntries2 = findDictEntriesWithExactMatch(selectedLetters);
-    if(matchingEntries2.length > 0) { 
-      dictionaryMatches.innerHTML = JSON.stringify(matchingEntries2[0]);
+    if(matchingEntries2.length > 0) {
+      dictionaryMatches.innerHTML = formatDictEntries(matchingEntries2);
       madeWordsList.unshift(selectedLetters + " ("+selectedLetters.length*10+"/"+currentWordCost+" = "+(selectedLetters.length*10/currentWordCost).toFixed(2)+")");
       score += selectedLetters.length*10/currentWordCost;
       selectedLetters = "";
@@ -129,22 +133,23 @@ document.addEventListener('keydown', (event) => {
     } else {
       incrementWordCost(notWordCost, "not a word");
     }
+    break;
+  case 'Backspace':
+    selectedLetters = selectedLetters.substring(0, selectedLetters.length - 1);
+    incrementWordCost(cursorCost, "backspace");
+    break;
   }
 
   if(cursor.x <= viewport.x1 && viewport.x1 > 0) {
-    incrementWordCost(viewportCost, "viewport left");
     viewport.x1 -= 1;
   }
   if(cursor.x >= viewport.x2 && viewport.x2 < gridSize.x-1) {
-    incrementWordCost(viewportCost, "viewport right");
     viewport.x2 += 1;
   }
   if(cursor.y <= viewport.y1 && viewport.y1 > 0) {
-    incrementWordCost(viewportCost, "viewport up");
     viewport.y1 -= 1;
   }
   if(cursor.y >= viewport.y2 && viewport.y2 < gridSize.y-1) {
-    incrementWordCost(viewportCost, "viewport down");
     viewport.y2 += 1;
   }
   draw();
@@ -157,12 +162,21 @@ const draw = () => {
   gameBoard.innerHTML = '';
   currentLetters.innerHTML = selectedLetters; // Render the selected letters into the "currentLetters" div
 
-  const cursorCurrentLetter = gameGrid[cursor.x][cursor.y];
+  const cursorCurrentLetter = gameGrid[cursor.x][cursor.y].letter;
 
   gameBoard.style.gridTemplateColumns = repeatString("1fr", viewport.x2 - viewport.x1 + 1);
 
   for(var y=viewport.y1;y<=viewport.y2;y++) {
     for(var x=viewport.x1;x<=viewport.x2;x++) {
+
+
+      if(
+        (x == cursor.x || x == cursor.x + 1 || x == cursor.x - 1) &&
+          (y == cursor.y || y == cursor.y + 1 || y == cursor.y - 1))
+      {
+        gameGrid[x][y].visible = true;
+      }
+
       const div = document.createElement("div");
       div.classList.add("item");
 
@@ -170,17 +184,21 @@ const draw = () => {
         div.classList.add("cursorItem");
       }
 
-      const wordSoFar = selectedLetters + gameGrid[x][y];
-      if(!validMoveCache.hasOwnProperty(wordSoFar)) {
-        const matchingEntries = findDictEntriesWithPrefix(wordSoFar);
-        validMoveCache[wordSoFar] = (matchingEntries.length > 0);
-      }
-      if(validMoveCache[wordSoFar]) {
-        div.classList.add("validMove");
-      }
+      if(gameGrid[x][y].visible) {
 
+        const wordSoFar = selectedLetters + gameGrid[x][y].letter;
+        if(!validMoveCache.hasOwnProperty(wordSoFar)) {
+          const matchingEntries = findDictEntriesWithPrefix(wordSoFar);
+          validMoveCache[wordSoFar] = (matchingEntries.length > 0);
+        }
+        if(validMoveCache[wordSoFar]) {
+          div.classList.add("validMove");
+        }
 
-      div.innerHTML = gameGrid[x][y];
+        div.innerHTML = gameGrid[x][y].letter;
+      } else {
+        div.innerHTML = "";
+      }
 
       gameBoard.appendChild(div);
     }
@@ -197,11 +215,9 @@ const draw = () => {
   });
 
   scoreDiv.innerHTML = "<h2>Score</h2>";
-  scoreDiv.innerHTML += "Score Total: " + score.toFixed(2) + " /<br>";
-  scoreDiv.innerHTML += "Keypresses: "+keypresses + " = <br>";
-  if(keypresses > 0) { 
-    scoreDiv.innerHTML += "<h3>"+(score/keypresses).toFixed(2)+"</h3>";
-  }
+  scoreDiv.innerHTML += "Score Total: <b>" + score.toFixed(2) + "</b><br>";
+  scoreDiv.innerHTML += "Word Count: <b>" + madeWordsList.length + "</b><br>";
+  scoreDiv.innerHTML += "Average: <b>" + (score/madeWordsList.length).toFixed(2) + "</b><br>";
 };
 
 
