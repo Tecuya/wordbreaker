@@ -44,6 +44,8 @@ var madeWordsList = [];
 var currentWordCost = 0;
 var currentWordLogList = [];
 
+const dictEntryLength = 80;
+
 function findDictEntriesWithPrefix(prefix) {
   return dictionary.filter(dictEntry => dictEntry[0].toLowerCase().startsWith(prefix.toLowerCase()));
 }
@@ -55,7 +57,7 @@ function findDictEntriesWithExactMatch(word) {
 function formatDictEntries(entries) {
   var response = "";
   var lastEntry = "";
-  entries.slice(0,20).forEach((entry) => {
+  entries.slice(0, dictEntryLength).forEach((entry) => {
     if(lastEntry != entry[0]) {
       response += "<b>"+entry[0]+"</b><br>";
       lastEntry = entry[0];
@@ -252,12 +254,11 @@ document.addEventListener('keydown', (event) => {
     testAndAcceptNewLetter(gameGrid[cursor.x][cursor.y].letter);
     break;
   case 'Enter':
-    const matchingEntries2 = entriesMinusCurrentWords(findDictEntriesWithExactMatch(selectedLetters));
-
     if(selectedLetters.length < minWordLength) {
       incrementWordCost(0, "word too short");
       break;
     }
+    const matchingEntries2 = entriesMinusCurrentWords(findDictEntriesWithExactMatch(selectedLetters));
     if(matchingEntries2.length > 0) {
       dictionaryMatches.innerHTML = formatDictEntries(matchingEntries2);
       madeWordsList.unshift({
@@ -275,6 +276,8 @@ document.addEventListener('keydown', (event) => {
     break;
   case 'Backspace':
     selectedLetters = selectedLetters.substring(0, selectedLetters.length - 1);
+    const matches = entriesMinusCurrentWords(findDictEntriesWithPrefix(selectedLetters));
+    dictionaryMatches.innerHTML = formatDictEntries(matches);
     incrementWordCost(cursorCost, "backspace");
     break;
   }
