@@ -135,9 +135,9 @@ const drawRules = () => {
   rules += "<b>Arbitrary Letter Cost:</b> "+arbitraryLetterCost+"<br />";
   rules += "<b>Reset Board Cost:</b> "+resetCost+"<br />";
   rules += "<b>Cursor Movement Cost:</b> "+cursorCost+"<br />";
-  rules += "<b>Min Word Length:</b>"+minWordLength+"<br />";
-  rules += "<b>Game Over Points:</b>"+scoreGoal+"<br />";
-  rules += "<b>Word Length Exponent:</b>"+lengthScale+"<br />";
+  rules += "<b>Min Word Length:</b> "+minWordLength+"<br />";
+  rules += "<b>Game Over Points:</b> "+scoreGoal+"<br />";
+  rules += "<b>Word Length Exponent:</b> "+lengthScale+"<br />";
   
   
   rulesModalVars.innerHTML = rules;
