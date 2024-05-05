@@ -15,13 +15,13 @@ let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
 const gridSize = {x: 10, y: 10};
 const startPosition = {x: 5, y: 5};
 
-const cursorCost = 1;
+const cursorCost = 0.5;
 const resetCost = 5;
 const notWordCost = 3;
 const typingCost = 10;
 const minWordLength = 2;
 const scoreGoal = 100;
-const wordLengthBonus = 20;
+const lengthScale = 2;
 
 var score = 0;
 
@@ -286,10 +286,10 @@ document.addEventListener('keydown', (event) => {
       dictionaryMatches.innerHTML = formatDictEntries(matchingEntries2);
       madeWordsList.unshift({
         word: selectedLetters,
-        scoring: "("+selectedLetters.length*wordLengthBonus+"/"+currentWordCost+" = "+(selectedLetters.length*wordLengthBonus/currentWordCost).toFixed(2)+")",
+        scoring: "("+selectedLetters.length+"^"+lengthScale+"/"+currentWordCost+" = "+(selectedLetters.length**2/currentWordCost).toFixed(2)+")",
         reusable: false,
       });
-      score += selectedLetters.length*wordLengthBonus/currentWordCost;
+      score += selectedLetters.length**lengthScale/currentWordCost;
       selectedLetters = "";
       currentWordCost = 0;
       currentWordLogList = [];
