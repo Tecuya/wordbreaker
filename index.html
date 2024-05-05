@@ -11,6 +11,13 @@
       margin-right: auto;
       display: grid;
       width: 800px;
+      height: 315px;
+    }
+    #help {
+      margin-left: auto;
+      margin-right: auto;
+    width: 800px;
+    font-size: 10px;
     }
     #dictionaryMatches {
       margin-left: auto;
@@ -24,7 +31,6 @@
       font-size: 24px;
       font-weight: bold;
       text-align: center;
-      margin: 10px;
       width: 800px;
       margin-left: auto;
       margin-right: auto;
@@ -34,6 +40,9 @@
       width: 200px;
       overflow: auto;
       float: left;
+    }
+    #currentWordLog div {
+      font-size: 8pt;
     }
     #madeWords {
       font-size: 15px;
@@ -58,14 +67,14 @@
       width: 800px;
     }
     .item {
-      padding: 10px;
       font-size: 20px;
       border: 2px solid #aaa;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .cursorItem {
       background: #FF8 !important;
-      padding: 10px;
       text-align: center;
     }
     .validMove {
@@ -93,6 +102,16 @@
   </div>
   <div id="dictionaryMatches">
   </div>
+  <div id="help">
+    <h3>Help</h3>
+    Cursor keys - move selection<br />
+    Space - make selection<br />
+    Enter - score current word<br />
+    A-Z keys - add letters to current word<br />
+    0 key - get a new board<br />
+    1 key - reset the game<br />
+  </div>
   <script type="module" src="game.js"></script>
+  
 </body>
 </html>
