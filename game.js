@@ -16,7 +16,7 @@ const rulesModalVars = document.getElementById("rulesModalVars");
 
 let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-const gridSize = {x: 11, y: 11};
+const gridSize = {x: 10, y: 10};
 const startPosition = {x: 5, y: 5};
 
 const cursorCost = 0.5;
