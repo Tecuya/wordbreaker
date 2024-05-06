@@ -23,7 +23,7 @@ const cursorCost = 0.5;
 const resetCost = 5;
 const notWordCost = 0;
 const arbitraryLetterCost = 3;
-const minWordLength = 2;
+const minWordLength = 3;
 const scoreGoal = 100;
 const lengthScale = 2; // note theres a hard-coded 2 unicode superscript
 
