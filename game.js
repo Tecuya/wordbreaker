@@ -138,15 +138,23 @@ const drawRules = () => {
   rules += "<b>Min Word Length:</b> "+minWordLength+"<br />";
   rules += "<b>Game Over Points:</b> "+scoreGoal+"<br />";
   rules += "<b>Word Length Exponent:</b> "+lengthScale+"<br />";
-  
-  
   rulesModalVars.innerHTML = rules;
 };
 
 const draw = () => {
 
   gameBoard.innerHTML = '';
-  currentLetters.innerHTML = selectedLetters;
+
+  var currentLettersString = selectedLetters;
+
+  if(selectedLetters.length >= minWordLength) { 
+    const matchingEntries4 = entriesMinusCurrentWords(findDictEntriesWithExactMatch(selectedLetters));
+    if(matchingEntries4.length > 0) {
+      currentLettersString += ' ('+explainScore()+')';
+    }
+  }
+
+  currentLetters.innerHTML = currentLettersString;
 
   const cursorCurrentLetter = gameGrid[cursor.x][cursor.y].letter;
 
@@ -192,9 +200,9 @@ const draw = () => {
   madeWords.innerHTML = "<h2>Word List</h2>";
   madeWordsList.forEach((word) => {
     if(word.reusable) {
-      madeWords.innerHTML += "<i>" + word.word + "</i>" + word.scoring + "<br />";
+      madeWords.innerHTML += "<i>" + word.word + "</i> (" + word.scoring + ")<br />";
     } else {
-      madeWords.innerHTML += word.word + " " + word.scoring + "<br />";
+      madeWords.innerHTML += word.word + " (" + word.scoring + ")<br />";
     }
   });
 
@@ -213,7 +221,16 @@ const draw = () => {
   scoreDiv.innerHTML += "Score: <b>" + (score/madeWordsList.length).toFixed(2) + "</b><br>";
 
   if(score > scoreGoal) {
-    gameOverModalStats.innerHTML = "Final Score: <b>" + (score/madeWordsList.length).toFixed(2) + "</b>";
+
+    var stats = "<h2>Final Score: " + (score/madeWordsList.length).toFixed(2) + "</h2>";
+
+    stats += "<h3>Word List</h3>";
+    [].concat(madeWordsList).reverse().forEach((word) => {
+      stats += word.word + " (" + word.scoring + ")<br />";
+    });
+
+    gameOverModalStats.innerHTML = stats;
+
     openGameOverModal();
   }
 };
@@ -271,6 +288,14 @@ rulesModalClose.onclick = function() {
   rulesModal.style.display = "none";
 }
 
+const scoreCurrentWord = () => {
+  return parseFloat(((selectedLetters.length**lengthScale)/currentWordCost).toFixed(2));
+};
+
+const explainScore = () => {
+  return selectedLetters.length+"²/"+currentWordCost+" = "+scoreCurrentWord();
+};
+
 document.addEventListener('keydown', (event) => {
   switch(event.key) {
   case '0':
@@ -316,12 +341,13 @@ document.addEventListener('keydown', (event) => {
     const matchingEntries2 = entriesMinusCurrentWords(findDictEntriesWithExactMatch(selectedLetters));
     if(matchingEntries2.length > 0) {
       dictionaryMatches.innerHTML = formatDictEntries(matchingEntries2);
+      const scoreDiff = scoreCurrentWord();
       madeWordsList.unshift({
         word: selectedLetters,
-        scoring: "("+selectedLetters.length+"²/"+currentWordCost+" = "+((selectedLetters.length**lengthScale)/currentWordCost).toFixed(2)+")",
+        scoring: explainScore(),
         reusable: false,
       });
-      score += (selectedLetters.length**lengthScale)/currentWordCost;
+      score += scoreDiff;
       selectedLetters = "";
       currentWordCost = 0;
       currentWordLogList = [];
@@ -356,7 +382,7 @@ document.addEventListener('keydown', (event) => {
       incrementWordCost(arbitraryLetterCost, "arbitrary letter " + typedLetter);
     }
   }
-  
+
   if(cursor.x <= viewport.x1 && viewport.x1 > 0) {
     viewport.x1 -= 1;
   }
@@ -374,4 +400,3 @@ document.addEventListener('keydown', (event) => {
 initializeGrid();
 drawRules();
 draw();
-
