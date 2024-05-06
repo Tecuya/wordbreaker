@@ -16,7 +16,7 @@ const rulesModalVars = document.getElementById("rulesModalVars");
 
 let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-const gridSize = {x: 10, y: 10};
+const gridSize = {x: 11, y: 11};
 const startPosition = {x: 5, y: 5};
 
 const cursorCost = 0.5;
@@ -318,10 +318,10 @@ document.addEventListener('keydown', (event) => {
       dictionaryMatches.innerHTML = formatDictEntries(matchingEntries2);
       madeWordsList.unshift({
         word: selectedLetters,
-        scoring: "("+selectedLetters.length+"²/"+currentWordCost+" = "+(selectedLetters.length**2/currentWordCost).toFixed(2)+")",
+        scoring: "("+selectedLetters.length+"²/"+currentWordCost+" = "+((selectedLetters.length**lengthScale)/currentWordCost).toFixed(2)+")",
         reusable: false,
       });
-      score += selectedLetters.length**lengthScale/currentWordCost;
+      score += (selectedLetters.length**lengthScale)/currentWordCost;
       selectedLetters = "";
       currentWordCost = 0;
       currentWordLogList = [];
@@ -333,7 +333,7 @@ document.addEventListener('keydown', (event) => {
     selectedLetters = selectedLetters.substring(0, selectedLetters.length - 1);
     const matches = entriesMinusCurrentWords(findDictEntriesWithPrefix(selectedLetters));
     dictionaryMatches.innerHTML = formatDictEntries(matches);
-    incrementWordCost(cursorCost, "backspace");
+    incrementWordCost(0, "backspace");
     break;
   }
 
