@@ -16,8 +16,8 @@ const rulesModalVars = document.getElementById("rulesModalVars");
 
 let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-const gridSize = {x: 10, y: 10};
-const startPosition = {x: 5, y: 5};
+const gridSize = {x: 11, y: 9};
+const startPosition = {x: 5, y: 4};
 
 const cursorCost = 0.5;
 const resetCost = 5;
@@ -37,10 +37,10 @@ const cursor = {
 };
 
 const viewport = {
-  x1: cursor.x-1,
-  y1: cursor.y-1,
-  x2: cursor.x+1,
-  y2: cursor.y+1,
+  x1: 0,
+  y1: 0,
+  x2: gridSize.x-1,
+  y2: gridSize.y-1,
 };
 
 let selectedLetters = '';
@@ -73,9 +73,9 @@ function formatDictEntries(entries) {
 
 function initializeGrid() {
   gameGrid = [];
-  for (let i = 0; i < gridSize.y; i++) {
+  for (let i = 0; i < gridSize.x; i++) {
     let row = [];
-    for (let j = 0; j < gridSize.x; j++) {
+    for (let j = 0; j < gridSize.y; j++) {
       let randomIndex = Math.floor(Math.random() * letters.length);
       row.push({letter: letters[randomIndex], visible: false});
     }
@@ -147,7 +147,7 @@ const draw = () => {
 
   var currentLettersString = selectedLetters;
 
-  if(selectedLetters.length >= minWordLength) { 
+  if(selectedLetters.length >= minWordLength) {
     const matchingEntries4 = entriesMinusCurrentWords(findDictEntriesWithExactMatch(selectedLetters));
     if(matchingEntries4.length > 0) {
       currentLettersString += ' ('+explainScore()+')';
