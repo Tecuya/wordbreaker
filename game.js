@@ -131,7 +131,7 @@ const drawRules = () => {
   var rules = "";
   rules += "<table>";
   rules += "<b>Grid Size:</b> "+gridSize.x+" x "+gridSize.y+"<br />";
-  rules += "<b>Start Position:</b> "+startPosition.x+" x "+startPosition.y+"<br />";
+  rules += "<b>Start Position:</b> "+(startPosition.x+1)+", "+(startPosition.y+1)+"<br />";
   rules += "<b>Arbitrary Letter Cost:</b> "+arbitraryLetterCost+"<br />";
   rules += "<b>Reset Board Cost:</b> "+resetCost+"<br />";
   rules += "<b>Cursor Movement Cost:</b> "+cursorCost+"<br />";
@@ -240,10 +240,6 @@ function fullReset() {
     initializeGrid();
     cursor.x = startPosition.x;
     cursor.y = startPosition.y;
-    viewport.x1 = cursor.x - 1;
-    viewport.y1 = cursor.y - 1;
-    viewport.x2 = cursor.x+1;
-    viewport.y2 = cursor.y+1;
     score = 0;
     madeWordsList = [];
     currentWordCost = 0;
@@ -305,10 +301,6 @@ document.addEventListener('keydown', (event) => {
     incrementWordCost(resetCost, "reset");
     cursor.x = startPosition.x;
     cursor.y = startPosition.y;
-    viewport.x1 = cursor.x - 1;
-    viewport.y1 = cursor.y - 1;
-    viewport.x2 = cursor.x+1;
-    viewport.y2 = cursor.y+1;
     initializeGrid();
     madeWordsList.forEach((word) => {
       word.reusable = true;
@@ -383,18 +375,6 @@ document.addEventListener('keydown', (event) => {
     }
   }
 
-  if(cursor.x <= viewport.x1 && viewport.x1 > 0) {
-    viewport.x1 -= 1;
-  }
-  if(cursor.x >= viewport.x2 && viewport.x2 < gridSize.x-1) {
-    viewport.x2 += 1;
-  }
-  if(cursor.y <= viewport.y1 && viewport.y1 > 0) {
-    viewport.y1 -= 1;
-  }
-  if(cursor.y >= viewport.y2 && viewport.y2 < gridSize.y-1) {
-    viewport.y2 += 1;
-  }
   draw();
 });
 initializeGrid();
