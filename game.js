@@ -19,11 +19,12 @@ let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
 const gridSize = {x: 11, y: 9};
 const startPosition = {x: 5, y: 4};
 
-const cursorCost = 0.5;
+const cursorCost = 0.25;
+const submitCost = 0.25;
 const resetCost = 5;
 const notWordCost = 0;
 const arbitraryLetterCost = 3;
-const minWordLength = 3;
+const minWordLength = 2;
 const scoreGoal = 100;
 const lengthScale = 2; // note theres a hard-coded 2 unicode superscript
 
@@ -106,6 +107,7 @@ function testAndAcceptNewLetter(newLetter) {
   if(matchingEntries3.length > 0) {
     dictionaryMatches.innerHTML = formatDictEntries(matchingEntries3);
     selectedLetters = prospectiveLetters;
+    incrementWordCost(submitCost, "submit "+newLetter);
   } else {
     const matchingEntries = entriesMinusCurrentWords(
       findDictEntriesWithPrefix(prospectiveLetters)
@@ -113,6 +115,7 @@ function testAndAcceptNewLetter(newLetter) {
     if(matchingEntries.length > 0) {
       dictionaryMatches.innerHTML = formatDictEntries(matchingEntries);
       selectedLetters = prospectiveLetters;
+      incrementWordCost(submitCost, "submit "+newLetter);
     }
   }
 }
@@ -135,6 +138,7 @@ const drawRules = () => {
   rules += "<b>Arbitrary Letter Cost:</b> "+arbitraryLetterCost+"<br />";
   rules += "<b>Reset Board Cost:</b> "+resetCost+"<br />";
   rules += "<b>Cursor Movement Cost:</b> "+cursorCost+"<br />";
+  rules += "<b>Submit Letter Cost:</b> "+submitCost+"<br />";
   rules += "<b>Min Word Length:</b> "+minWordLength+"<br />";
   rules += "<b>Game Over Points:</b> "+scoreGoal+"<br />";
   rules += "<b>Word Length Exponent:</b> "+lengthScale+"<br />";
